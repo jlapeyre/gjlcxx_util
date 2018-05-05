@@ -1,11 +1,10 @@
+## Utility routines and classes for C/C++
 
-Mon Oct 27 18:15:11 CET 2014
-
-Utility routines and classes for things I use repeatedly in C/C++/perl
-mostly for Monte Carlo simulations.
+These tools are for things I use repeatedly, mostly for Monte Carlo simulations.
 
 
---------------------
+### Installation
+
 See INSTALL for changing the following
 
 library:
