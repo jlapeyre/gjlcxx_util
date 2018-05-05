@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 /*****************************************************
 * Copyright 2014 John Lapeyre                        *

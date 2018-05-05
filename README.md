@@ -13,7 +13,13 @@ See for instance `scripts/gjl_gen_header --man`. This perl script reads a specif
 file of parameters (for, say, Monte Carlo) and writes a C++ class that allows setting the values and
 printing them in a nice way in the header of a data file.
 
-### Installation
+### Dependencies
+
+Google C++ test framework. This is now available as a debian package
+
+### Build and Install
+
+Build with `make all`.
 
 See INSTALL for changing the following
 

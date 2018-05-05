@@ -45,7 +45,8 @@ $(TEST_SRC)/vec2d : $(TEST_SRC)/vec2d.o $(LIB_SRC)/cpu_timer.o
 ########################################################################################
 # Section 3  Build flags that we may want to change
 ########################################################################################
-GTEST_SRC = /home/jlapeyre/software_source/gtest/gtest-1.7.0
+GTEST_SRC = /usr/src/googletest/googletest/include/gtest
+
 INC_LOCAL = -I/usr/local/include/c++
 INC_BUILD = -I./cpp_headers -I.
 INC = $(INC_BUILD) $(INC_LOCAL) -I$(GTEST_SRC)/include
