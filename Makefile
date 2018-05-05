@@ -2,7 +2,7 @@ NO_OPTIMIZATION_YES_DEBUGGING = 0
 USE_CLANG_NOT_GCC = 0
 
 # google unit testing library
-HAVE_GTEST = 0
+HAVE_GTEST = 1
 
 ############################################
 # Section 1  Exectuables and source files
@@ -17,7 +17,7 @@ EXECUTABLES_WITH_SINGLE_SOURCE = $(TEST_SRC)/simple_linear_regression_test \
     $(TEST_SRC)/test_hist_pdf $(TEST_SRC)/test_arr_irreg
 
 ifeq ($(HAVE_GTEST), 1)
-EXECUTABLES_WITH_SINGLE_SOURCE += hist_pdf_unittest
+EXECUTABLES_WITH_SINGLE_SOURCE += $(TEST_SRC)/hist_pdf_unittest
 endif
 
 BROKEN_AND_UNUSED1 = 
@@ -193,7 +193,7 @@ test_hist_pdf.o : $(CPP_HEADERS_SRC)/hist_pdf.h
 
 hkperc.o : hkcluster.h hkperc_2d_site.h walk_2d.h perc_2d_site.h walkperc_opts.h
 
-hist_pdf_unittest.o : hist_pdf.h
+hist_pdf_unittest.o : $(CPP_HEADERS_SRC)/hist_pdf.h
 
 cpu_timer.o : $(CPP_HEADERS_SRC)/cpu_timer.h
 

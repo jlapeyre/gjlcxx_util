@@ -2,6 +2,9 @@
 
 These tools are for things I use repeatedly, mostly for Monte Carlo simulations.
 
+See the comments in template headers [cpp_headers/](c_cpp_problems/) for descriptions
+and usage.
+
 Also, in [c_cpp_problems/](c_cpp_problems/) I have recorded the solution to problems
 I encountered so that I don't have to solve them again.
 
