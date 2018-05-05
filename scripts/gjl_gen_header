@@ -1,0 +1,432 @@
+#!/usr/bin/env perl
+use v5.10.0;
+use Carp;
+use Text::ParseWords;
+use Getopt::Long;
+use Pod::Usage;
+our $Script_name = 'gjl_gen_header';
+our $VERSION = "0.0.1";
+
+my %Options = ();
+
+GetOptions(\%Options, 'debug', 'help|h|?', 'man', 'notimer');
+pod2usage(1) if $Options{help};
+pod2usage(-exitval => 0, -verbose => 2) if $Options{man};
+
+sub error_msg_and_die {
+    my ($s) = @_;
+    die $Script_name . ': ' . $s;
+}
+
+sub debug_mssg {
+    my ($s) = @_;
+    say STDERR $s if $Options{debug};
+}
+
+my $Spec_filename = $ARGV[0];
+error_msg_and_die("No filename given. Try command line switch '-h'.") unless defined $Spec_filename;
+
+my $Out_fname = '';
+my $Classname; #  = "FillDistHeader";
+my $Print_header_args = '';
+my $Call_getters_code = '';
+my $String_t = "std::string";
+my $Str_suffix = '_str_';
+my $Comment_str = '#';
+my $Separator_str = ' = ';
+my $Ostream = "out";
+my $NA_char = '%';   # 'not applicable' character
+
+my %Cpu_timer = (
+       include_header => '',
+       timer_member => '',
+       hostname_member => '',
+       init => '',
+       write_header_code => ''
+ );
+
+my @Data_members = ();
+my %Spec_handler;
+
+sub make_cpu_timer_code {
+    my $pad = ' ' x 7;
+    %Cpu_timer = (
+        include_header => "#include <gjl/cpu_timer.h>\n",
+        timer_member => "Timer timer_;\n",
+        hostname_member => "std::string hostname_;\n",
+        init => "timer_.cpu().disable_save_splits();\n" .
+                "$pad timer_.clock().start();\n" .
+                "$pad timer_.start();",
+        write_header_code => make_one_line_writer('timer_.cpu().minutes()', ensure_string('cpu time'), ensure_string(' minutes'))
+        . make_one_line_writer('timer_.hostname()',ensure_string('hostname'))
+        . "timer_.clock().record();\n"
+        . make_one_line_writer({nonewline => 1}, 'timer_.clock().clock_start_string()', ensure_string('start time'))
+        . make_one_line_writer({nonewline => 1}, 'timer_.clock().clock_stop_string()',  ensure_string('stop  time'))
+        . make_one_line_writer('timer_.clock().elapsed_minutes()',  ensure_string('elapsed time (m)'))
+        );
+}
+
+
+sub add_data_member {
+    my ($type,$identifier,$initval,$text,$entry_getter) = @_;
+    debug_mssg("adding: ($type,$identifier,$initval,$text,$entry_getter)");
+    $type = strip_double_quotes($type);
+    push @Data_members, { type => $type,  identifier => $identifier, initval => $initval, text => $text,
+    entry_getter => $entry_getter};
+}
+
+sub make_one_line_writer {
+    my @args = @_;
+    my $hash = {};
+    $hash = shift(@args) if (ref($args[0]) =~ /HASH/);
+    my ($class_getter,$text_var,$post_text) = @args;
+    my $pad = ' ' x 7;
+    my $s = $pad . "$Ostream << comment_str_ << \" \" << $text_var << separator_str_ << $class_getter ";
+    $s .= " <<  $post_text " if defined $post_text;
+    if (defined $hash->{nonewline}) {
+        $s .= ";\n";
+    }
+    else {
+        $s .= "<< \"\\n\";\n";
+    }
+#    return $pad . "$Ostream << comment_str_ << \" \" << $text_var << separator_str_ << $class_getter 
+    return $s;
+}
+
+sub make_data_members_string {
+    my $data_members = "";
+    my $data_methods = "";
+    my $output_writers = "";
+    my $pad = ' ' x 10;
+    my $pad1 = ' ' x 7;
+    $output_writers .= make_one_line_writer("compile_time_", ensure_string("Compile date"));
+    foreach my $h (@Data_members) {
+        my ($type,$identifier,$initval,$text,$entry_getter) = (undef,undef,undef,undef,undef);
+        ($type,$identifier,$initval,$text,$entry_getter) 
+            = ($h->{type}, $h->{identifier}, $h->{initval},$h->{text}, $h->{entry_getter});
+        debug_mssg("proccessing: ($type,$identifier,$initval,$text,$entry_getter)");
+        $initval = undef if $initval eq $NA_char;
+        $entry_getter = undef if $entry_getter eq $NA_char;
+        my $identifier_ = $identifier . '_';
+        my $class_getter = "$identifier()";
+        my $text_var =  $identifier . $Str_suffix;
+        if (defined $initval) {
+            $data_members .= $pad . $type . ' ' . $identifier_ . ' = ' . $initval . ";\n";
+        }
+        else {
+            $data_members .= $pad . $type . ' ' . $identifier_ . ";\n";
+        }
+        $data_members .= $pad . 'std::string ' . $text_var . ' = std::string(' . $text . ');' . "\n";
+        $data_methods .= $pad . $type . ' ' . $identifier . "() {return $identifier_;}\n";
+        my $setter = 'set_' . $identifier;
+        $data_methods .= $pad . 'void ' . $setter .  "($type $identifier) {$identifier_ = $identifier;}\n";
+        $output_writers .= make_one_line_writer($class_getter, $text_var);
+        if (defined $entry_getter) {
+            debug_mssg(" writing call getter: $entry_getter");
+            $Call_getters_code .= $pad1 . $setter . '(' . $entry_getter . ");\n";
+        }
+    }
+    $data_members .= $pad . "$String_t comment_str_ = std::string(\"$Comment_str\");\n";
+    $data_members .= $pad . "$String_t separator_str_ = std::string(\"$Separator_str\");\n";
+    $data_members .= $pad . "const char * compile_time_ = __DATE__\" \" __TIME__;\n";
+    return ($data_members,$data_methods,$output_writers);
+}
+
+sub write_print_header_function {
+    my  ($func_name,$output_writers) = @_;
+    return <<"EOCODE";
+    void ${Classname}::${func_name}($Print_header_args std::ostream& $Ostream) {
+        $Call_getters_code
+        $Cpu_timer{write_header_code}
+        $output_writers
+    }
+EOCODE
+}
+
+
+sub write_header_code {
+    my ($data_members, $data_methods, $output_writers) = @_;
+    my $print_header = write_print_header_function("print_header", $output_writers);
+    my $str = <<"EOCODE";
+\#include <string>
+\#include <iostream>
+$Cpu_timer{include_header}
+// Created by $Script_name v $VERSION
+
+    class $Classname {
+      public:
+       $Classname() { $Cpu_timer{init} }
+$data_methods
+
+      void print_header($Print_header_args std::ostream& $Ostream = std::cout);
+
+      private:
+$Cpu_timer{timer_member}
+$Cpu_timer{hostname_member}
+$data_members           
+    };
+
+    $print_header
+
+EOCODE
+    return $str;
+}
+
+sub make_and_write_header_code {
+    my ($data_members, $data_methods, $output_writers) =  make_data_members_string();
+    open my $ofh, '>', $Out_fname or error_msg_and_die("Can't open header file '$Out_fname' for writing.");
+    say $ofh write_header_code($data_members, $data_methods, $output_writers);
+    close($ofh);
+}
+
+sub ensure_string {
+    my ($s) = @_;
+    my ($qu1,$qu2) = (0,0);
+    $qu1 = 1 if $s =~ /^"/;
+    $qu2 = 1 if $s =~ /"$/;
+    return $s if ($qu1 and $qu2);
+    return '"' . $s . '"' unless ($qu1 or $qu2);
+}
+
+sub strip_double_quotes {
+    my $s = shift;
+    $s =~ s/^\"//;
+    $s =~ s/\"$//;
+    return $s;
+}
+
+
+$Spec_handler{program_name} = sub {
+    my (@fields) = @_;
+    my $name = ensure_string($fields[0]);
+    add_data_member($String_t, "program_name", 
+                    "std::string($name)", ensure_string("program"), $NA_char);
+};
+
+$Spec_handler{class_name} = sub {
+    my (@fields) = @_;
+    $Classname = $fields[0];
+};
+
+$Spec_handler{print_header_args} = sub {
+    my (@fields) = @_;
+    my $arglist = join(" ", @fields); # not efficient !
+    $Print_header_args = $arglist . ', ';
+};
+
+$Spec_handler{version} = sub {
+    my (@fields) = @_;
+    if ( defined $fields[0] && 'from' eq $fields[0]) {
+        my ($file,$keyword) = ($fields[1],$fields[2]);
+        open my $fh, '<', $file or error_msg_and_die("Can't open file '$file' to read version number.");
+        my $got_version = 0;
+        my $version;
+        while (<$fh>) {
+            if (/^\s*$keyword\s+([^\s]+)/) {
+                $version = $1;
+                $version =~ s/^\;//;
+                $got_version = 1;
+                last;
+            }
+        }
+        close($fh);
+        error_msg_and_die("Unable to find version number in file '$file'") unless $got_version;
+        add_data_member($String_t, "version", 
+                        "std::string($version)", ensure_string("version"), $NA_char);
+    }
+};
+
+sub read_spec_file {
+    my ($Spec_filename) = @_;
+    open my $ifh, '<', $Spec_filename or error_msg_and_die("Can't open header spec file '$Spec_filename' for reading.");
+    debug_mssg('Reading from spec file '. $Spec_filename);
+    while (my $line = <$ifh>) {
+        chomp($line);
+        next if $line =~ /^\s*#/;
+        next if $line =~ /^\s*$/;
+        if ($line =~ /^\!/) {
+            $line =~ s/^\!//;
+            my ($entry,@fields) = split(/\s+/,$line);
+            if (exists $Spec_handler{$entry}) {
+                &{$Spec_handler{$entry}}(@fields);
+            } 
+            else {
+                croak("Unknown standard entry !$entry");
+            }
+        }
+        else {
+            my $keep = 1;
+            my (@fields) = quotewords('\s+',$keep,$line);
+            error_msg_and_die("$Spec_filename line $.:\n$line\nExpected four or more fields header entry specification.")
+                unless @fields >= 4;
+            my ($type,$name,$initval,$str,$entry_getter) =  @fields;
+            $entry_getter = $NA_char unless defined $entry_getter;
+            add_data_member($type,$name,$initval,$str,$entry_getter)
+        }
+    }
+    close($ifh);
+}
+
+sub make_class_name {
+    my $classname = $Spec_filename;
+    $classname =~ s/\.[^\.]+$//;
+    $classname =~ s/^(.)/uc($1)/e;
+    $classname =~ s/_(.)/uc($1)/eg;
+    $Classname = $classname;
+}
+
+sub make_out_fname {
+    $Out_fname = $Spec_filename;
+    $Out_fname =~ s/\.[^\.]+$//;
+    $Out_fname .= '.h';
+    error_msg_and_die("Input and output filenames are the same.") if $Out_fname eq $Spec_filename;
+}
+
+make_class_name();
+make_out_fname();
+make_cpu_timer_code() unless $Options{notimer};
+read_spec_file($Spec_filename);
+make_and_write_header_code();
+
+__END__
+
+=head1 NAME
+
+I<gjl_gen_header> - Write a c++ class for a data file header
+
+=head1 SYNOPSIS
+
+gjl_gen_header [--debug] [--help] [-h] [--man] specfilename
+
+=head1 DESCRIPTION
+
+Read a c++ data file header class specification from from a specification file and write a c++ header
+contaning the class definition and all code.
+
+gjl_gen_header reads a file specifying a c++ class that writes headers for data files and writes
+the c++ code to a single output file. For example,
+
+my_prog_header.gh:
+
+ # data file header specification
+ !program_name my_prog
+ int L 0 "Length"
+
+my_prog.cc:
+
+  #include "my_prog_header.h"
+
+  ...
+
+  MyProgHeader h;
+  int L = 1;
+  h.set_L(L);
+  h.print_header();
+
+The output is
+
+  # Compile date = Nov 13 2014 19:39:53
+  # program = my_prog
+  # Length = 1
+
+The following
+
+  std::ofstream out; ...
+  h.print_header(out);
+
+will print the output to stream `out'.
+
+The line
+
+ int L 0 "Length"
+
+specifies a member variable of the class MyProgHeader of type int, with identifer L_, initialized
+to 0, and with description "Length". This member variable can be set with the class function
+set_L(). The line
+
+ !program_name my_prog
+
+begins with a `!', which says that this line is a special command, rather than
+the specification of a member variable. In this case, it is equivalent to the
+following specification of a member variable
+
+ std::string program_name "my_prog" "program"
+
+Another example of a member variable specification is
+
+ "long long" seed % "rng seed"
+
+Here, the variable type contains a space, so it is enclosed in double quotes. The
+character `%' means that no initialization is done. If this command is given
+
+ !class_name My_prog
+
+then the class name will be My_prog rather than the default MyProg, which is taken
+from the name of the specification file. This command
+
+ !version from my_prog.cc Version
+
+creates a member variable version_. The initial value is extracted from the file `prog.cc'
+from the first line that contains the string `Version', which may be preceeded only by
+white space. This version number will then be printed by print_header().
+
+Setters may be called automatically as follows. In the specification file write
+
+ !print_header_args class_or_struct& instance
+ int L 0 "L" instance.getL()
+
+In the my_prog.cc write
+
+  class_or_struct instance; ...
+  print_header(instance,outstream)
+
+In this case, set_L() is not called explicitly by the user, but is called automatically from within
+print_header(). The line beginning with !print_header_args specifies extra arguments to be passed to print_header. These
+must be separated by a comma. The code
+
+  set_L(instance.getL());
+
+will then be executed in the call to print_header() before printing the header. For instance, if parameters
+are set using gengetopt, then the instance of C<struct gengetopt_args_info> may be passed to print_header
+to set many parameter values automatically.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--man>
+
+Print the man page
+
+=item B<--notimer>
+
+Do not include cpu time, clock time, hostname in the data file header.
+
+=item B<--debug>
+
+Print some debugging information.
+
+=item B<--help>
+
+Print some help.
+
+=back
+
+=head1 TODO
+
+There are many easy, useful improvements, such as selecting the format of the output header.
+I have not implemented them yet, because I don't yet need them.
+
+=head1 AUTHOR
+
+John Lapeyre
+
+=head1 LICENSE
+
+Copyright 2014 John Lapeyre.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: the GNU General Public License as
+published by the Free Software Foundation; or the Artistic License.
+
+=cut

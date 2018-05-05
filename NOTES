@@ -1,0 +1,6 @@
+Sun Nov 16 16:02:22 CET 2014
+
+making version 0.0.10. This fixes a few bugs, big and small.
+This version supports only printing collected array values
+with the same number of counts. This is needed for application
+output. So... earlier data is best discarded.

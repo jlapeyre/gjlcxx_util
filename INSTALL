@@ -1,0 +1,23 @@
+Sun Nov  9 14:00:08 CET 2014
+
+This Makefile (and software) is GNU/Linux-centric.
+To build and install,
+
+ > make realclean
+ > make all
+ > make test (only a bit there now)
+ > make INSTALL_PREFIX=/home/joeuser/local install
+
+The default INSTALL_PREFIX is /usr/local.
+You may need to set variables in Makefile.
+
+Files will be installed in
+ $(INSTALL_PREFIX)/bin
+ $(INSTALL_PREFIX)/include
+ $(INSTALL_PREFIX)/lib
+
+ 
+ 
+
+
+ 

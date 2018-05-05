@@ -1,0 +1,12 @@
+*~
+*.o
+
+a.out
+libgjlutils.a
+simple_linear_regression_test
+test_cpu_timer
+hist_pdf_unittest
+test_hist_pdf
+vec2d
+test_arr_irreg
+

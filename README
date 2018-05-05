@@ -1,0 +1,19 @@
+
+Mon Oct 27 18:15:11 CET 2014
+
+Utility routines and classes for things I use repeatedly in C/C++/perl
+mostly for Monte Carlo simulations.
+
+
+--------------------
+See INSTALL for changing the following
+
+library:
+We install a static library to
+/usr/local/lib/libgjlutils.a
+
+headers:
+And put below /usr/local/include/
+
+binaries:
+/usr/local/bin
