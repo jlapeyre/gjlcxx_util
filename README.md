@@ -19,7 +19,7 @@ Google C++ test framework. This is now available as a debian package
 
 ### Build and Install
 
-Build with `make all`.
+Build with `make all`. Test with `make test`.
 
 See INSTALL for changing the following
 

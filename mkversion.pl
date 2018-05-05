@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.10.0;
+## This is obsolete
 # make a tar archive of the HEAD of the git repo.
 # If flag -b given then increment the version number and
 # tag the repo with the new number before writing the archive.
