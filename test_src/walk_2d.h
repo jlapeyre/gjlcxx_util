@@ -26,7 +26,7 @@ public:
   // already defined below !
   //  inline coord_t xrel(coord_t x) {return x - Lx_/2;}
   //  inline coord_t yrel(coord_t y) {return y - Ly_/2;}
-  
+
   inline coord_t x0() const { return Lx_/2;}
   inline coord_t y0() const { return Ly_/2;}
 
@@ -56,7 +56,7 @@ public:
 
   inline void increment_num_of_walks() { ++n_walks_; }
 
-  inline void init_bound_walk(size_t num_steps) { 
+  inline void init_bound_walk(size_t num_steps) {
     num_steps_to_do_ = num_steps;
     init_bound_walk();
   }
@@ -86,7 +86,7 @@ public:
   }
   inline void resize_xyrec () { resize_xyrec(num_steps_to_do_); }
 
-  inline void reset_xyrec_its () { 
+  inline void reset_xyrec_its () {
     it_xrec_ = xrec_.begin();
     it_yrec_ = yrec_.begin();
   }
@@ -133,7 +133,7 @@ public:
 
   inline coord_t xrelprev() { return xrel(xprev());}
   inline coord_t yrelprev() { return yrel(yprev());}
-  
+
   inline void do_one_bound_step();
   inline void do_bound_steps(size_t n);
   inline void do_bound_steps() { do_bound_steps( num_steps_to_do_ ); }
@@ -188,7 +188,7 @@ private:
 
   //  std::mt19937_64 generator_;
 
-  std::uniform_real_distribution<double> sample_ {0.0, 1.0};  
+  std::uniform_real_distribution<double> sample_ {0.0, 1.0};
   inline double urandom() { return sample_(generator_); }
 
 }; /******** END class class Walk2D  */

@@ -39,7 +39,6 @@
  * Paul Heckbert	13 Sept 1982, 28 Jan 1987
  */
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
@@ -58,7 +57,7 @@ public:
   void constructor_helper ();
 
   /* push new segment on stack */
-  inline void push_seg(const SEG_T Y, const SEG_T XL, const SEG_T XR, const int DY); 
+  inline void push_seg(const SEG_T Y, const SEG_T XL, const SEG_T XR, const int DY);
   inline void pop_seg(SEG_T  & Y, SEG_T & XL, SEG_T & XR, int  & DY);
   inline index_t site_index(const index_t x, const index_t y) const {return L_*x+y; }
   inline site_t & site(const index_t x, const index_t y) { return lattice_[site_index(x,y)]; }
@@ -96,19 +95,23 @@ public:
 
   void set_all_but_magic_value(const site_t new_value, site_t magic_value, std::vector<site_t> *set_values);
 
-  /* Find old value at seed point. Find all points contiguous with seed point that
-     have old value. Replace them with new value.  */
+  /*
+     Find old value at seed point. Find all points contiguous with seed point that
+     have old value. Replace them with new value.
+  */
   void fill_one_value(const index_t x, const index_t y, const site_t new_value);
 
-  /* Starting at seed point, find all points contiguous with seed point that
-     do not have border value. Replace them with new value.  */
+  /*
+     Starting at seed point, find all points contiguous with seed point that
+     do not have border value. Replace them with new value.
+  */
   void fill_to_border_value(const index_t x, const index_t y, const site_t new_value,
                             const site_t border_value);
 
   void fill_to_border_value2(const index_t x, const index_t y, const site_t new_value,
                              const site_t border_value,
-                             site_t (*siteread) (index_t,index_t,void *), 
-                             void (*sitewrite) (index_t,index_t, site_t nv, void *), 
+                             site_t (*siteread) (index_t,index_t,void *),
+                             void (*sitewrite) (index_t,index_t, site_t nv, void *),
                              void *p);
 
   void set_lattice(site_t *lattice) { lattice_ = lattice;}
@@ -125,7 +128,7 @@ public:
 
   /*
     Must restore values in reverse order, because some values were written more than once.
-     We need FILO. We could also fix the seed fill code to fill each site no more than once.
+    We need FILO. We could also fix the seed fill code to fill each site no more than once.
   */
   inline void restore_old_values () {
     timer_no_save_split();
@@ -158,7 +161,7 @@ private:
   std::vector<index_t> indices_of_old_values_;
   std::vector<site_t> old_values_;
   CpuTimer timer_;
-  
+
 }; /* End class SeedFill */
 
 /************************************************************
@@ -176,7 +179,7 @@ void SeedFill<index_t,site_t>::constructor_helper() {
 }
 
 /************************************************************
- ***  class SeedFill Member functions
+ * class SeedFill Member functions
  ************************************************************/
 
 template <typename index_t,  typename site_t>
@@ -203,13 +206,13 @@ void SeedFill<index_t,site_t>::set_all_but_magic_value(site_t new_value, site_t 
   timer_save_split("set all but magic value.");
 }
 
-  /* 
+  /*
    * Set all values to new_value, except those which are magic_value.
    * Return in set_values a list of labels which were changed. This list includes neither
    * new_value nor magic_value.
    */
 template <typename index_t,  typename site_t>
-void SeedFill<index_t,site_t>::set_all_but_magic_value(site_t new_value, site_t magic_value, 
+void SeedFill<index_t,site_t>::set_all_but_magic_value(site_t new_value, site_t magic_value,
                                                        std::vector<site_t> *set_values) {
   timer_no_save_split();
   std::unordered_set<site_t> setvals;
@@ -229,7 +232,7 @@ void SeedFill<index_t,site_t>::set_all_but_magic_value(site_t new_value, site_t 
 
 /* In principle, index_t could be unsigned. But code fails in this case. */
 template <typename index_t,  typename site_t>
-void SeedFill<index_t,site_t>::fill_one_value(index_t xin, index_t yin, 
+void SeedFill<index_t,site_t>::fill_one_value(index_t xin, index_t yin,
                                               site_t new_value)
 {
   index_t x = xin;
@@ -243,13 +246,13 @@ void SeedFill<index_t,site_t>::fill_one_value(index_t xin, index_t yin,
   sp_ = stackp_;
 
   old_value = site(x,y); /* read pv at seed point */
-  if (old_value==new_value || x<window_.x0 || x>window_.x1 
+  if (old_value==new_value || x<window_.x0 || x>window_.x1
       || y<window_.y0 || y>window_.y1) return;
   push_seg(y, x, x, 1);			/* needed in some cases */
   push_seg(y+1, x, x, -1);		/* seed segment (popped 1st) */
   while (sp_>stackp_) {
     std::cerr << "sc " << stack_counter_ << "\n";
-    /* pop segment off stack and fill a neighboring scan line */
+    // pop segment off stack and fill a neighboring scan line
     pop_seg(y, x1, x2, dy);
     /*
      * segment of scan line y-dy for x1<=x<=x2 was previously filled,
@@ -278,7 +281,7 @@ skip:	    for (x++; x<=x2 && site(x,y) !=old_value; x++);
 }
 
 template <typename index_t,  typename site_t>
-void SeedFill<index_t,site_t>::fill_to_border_value(index_t xin, index_t yin, 
+void SeedFill<index_t,site_t>::fill_to_border_value(index_t xin, index_t yin,
                                                     site_t new_value, site_t border_value)
 {
   timer_no_save_split();
@@ -349,7 +352,7 @@ void SeedFill<index_t,site_t>::fill_to_border_value(index_t xin, index_t yin,
 template <typename index_t,  typename site_t>
 void SeedFill<index_t,site_t>::fill_to_border_value2
   (index_t xin, index_t yin, site_t new_value, site_t border_value,
-   site_t (*siteread) (index_t,index_t,void *), 
+   site_t (*siteread) (index_t,index_t,void *),
    void (*sitewrite) (index_t,index_t, site_t nv, void *), void *p )
 {
   //  std::cerr << "Entered seedfill\n";
@@ -363,11 +366,8 @@ void SeedFill<index_t,site_t>::fill_to_border_value2
   stackp_ = &(stack_[0]); // need this.
   sp_ = stackp_;
 
-
-
-
   old_value = (*siteread)(x,y,p); /* read pv at seed point */
-  if (old_value == border_value || x<window_.x0 || x>window_.x1 
+  if (old_value == border_value || x<window_.x0 || x>window_.x1
       || y<window_.y0 || y>window_.y1) {
     std::cerr << "seedfill: seed site outside window or on border\n";
     std::cerr << "value at seed site ("  << x << "," << y << ") is "
@@ -402,7 +402,7 @@ void SeedFill<index_t,site_t>::fill_to_border_value2
 	if (left<x1) push_seg(y, left, x1-1, -dy);		/* leak on left? */
 	x = x1+1;
 	do {
-          for (; x<=window_.x1 && ((*siteread)(x,y,p) != border_value 
+          for (; x<=window_.x1 && ((*siteread)(x,y,p) != border_value
                                    && (*siteread)(x,y,p) != new_value) ; x++) {
             (*sitewrite)(x,y,new_value,p);
             fill_count_++;
@@ -417,14 +417,14 @@ skip:	    for (x++; x<=x2 && ((*siteread)(x,y,p) == border_value || (*siteread)(
 }
 
 /************************************************************
- ***  END class SeedFill Member functions
+ * END class SeedFill Member functions
  ************************************************************/
 
-/**************************************************************************
+/*************************************************************
  *
  *  Non-OO version below
  *
- **************************************************************************/
+ *************************************************************/
 
 #define SITEREAD (lattice[L*x+y])
 #define SITEWRITE (lattice[L*x+y] = nv)
@@ -436,7 +436,6 @@ typedef struct {		/* window: a discrete 2-D rectangle */
 
 #define MAX 10000		/* max depth of stack */
 //int MAX = 10000;		/* max depth of stack */
-
 
 #define PUSH(Y, XL, XR, DY)	/* push new segment on stack */ \
     if (sp<stack+MAX && Y+(DY)>=win->y0 && Y+(DY)<=win->y1) \
@@ -475,7 +474,7 @@ void fill(index_t x, index_t y, Window * win, site_t nv, size_t L, site_t *latti
   if (ov==nv || x<win->x0 || x>win->x1 || y<win->y0 || y>win->y1) return;
   PUSH(y, x, x, 1);			/* needed in some cases */
   PUSH(y+1, x, x, -1);		/* seed segment (popped 1st) */
-  
+
   while (sp>stack) {
     /* pop segment off stack and fill a neighboring scan line */
     POP(y, x1, x2, dy);

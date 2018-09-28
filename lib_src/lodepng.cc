@@ -1542,7 +1542,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
       }
 
       if(hashpos == hash->chain[hashpos]) break;
-      
+
       if(numzeros >= 3 && length > numzeros) {
         hashpos = hash->chainz[hashpos];
         if(hash->zeros[hashpos] != numzeros) break;
@@ -3548,7 +3548,7 @@ unsigned get_color_profile(LodePNGColorProfile* profile,
     for(i = 0; i < numpixels; i++)
     {
       getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode);
-      
+
       if(!colored_done && (r != g || r != b))
       {
         profile->colored = 1;

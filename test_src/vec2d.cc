@@ -21,7 +21,7 @@ public:
   inline typename std::vector<data_t>::iterator begin() {return vec_.begin();}
   inline typename std::vector<data_t>::iterator end() {return vec_.end();}
 
-  inline void resize(const size_t nx, const size_t ny) { 
+  inline void resize(const size_t nx, const size_t ny) {
     nx_ = nx; ny_ = ny;
     set_size_();
     vec_.resize(size());
@@ -33,7 +33,7 @@ public:
   inline data_t & operator()(const int i) {return vec_[i];}
 
   inline int index(const int i, const int j) {return i*ny_+j;}
-  
+
 private:
   inline void set_size_() { n_ = nx_ * ny_;}
 
@@ -165,12 +165,12 @@ int main() {
 
   Vector2D<double> w(Lx,Ly);
   t.print_split_seconds();
-  
+
   std::cout << "Go!\n";
 
   set_with_two_loops_vector(w);
   t.print_split_seconds();
- 
+
   set_with_two_loops_vector_fast(w);
   t.print_split_seconds();
 

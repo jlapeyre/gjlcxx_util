@@ -35,9 +35,7 @@
 
   There is a file pointer fp that can be set to print the matrix
   output or to send it to /dev/null.
-
- */
-
+*/
 
 /*
   Set the size of the array for all tests.
@@ -47,7 +45,8 @@
 #define NX 100
 #define NY 90
 
-/* Sum of array values. If a test array does not sum to this, it
+/*
+   Sum of array values. If a test array does not sum to this, it
    is wrong.
 */
 int SUM;
@@ -55,27 +54,27 @@ int SUM;
 // Whether to free memory. One test crashes when freeing
 int free_array_flag = 1;
 
-/******************************************/
 // The data type, and format for all arrays.
 typedef int data_t;
 #define MYFORM %d\t
 
 //typedef float data_t;
 //#define MYFORM %f\t
-/******************************************/
 
-/* For using string macros to set output format string */
+// For using string macros to set output format string
 #define STR(x) #x
 #define STRINGIFY(x) STR(x)
 
-/* For printing arrays. Set in main() to print either
-to /dev/null or stdout.  */
+/*
+   For printing arrays. Set in main() to print either
+   to /dev/null or stdout.
+*/
 FILE *fp;
 
-/******************************************************
- * Allocate a dynamic 2d array implemented via an array of pointers
- * to pointers.
- */
+/*
+  Allocate a dynamic 2d array implemented via an array of pointers
+  to pointers.
+*/
 data_t ** alloc_array (int nx, int ny) {
   data_t **m = (data_t **) malloc(sizeof(data_t *) * nx);
   int i;
@@ -91,10 +90,10 @@ void free_array (data_t **m, int nx) {
     }
 }
 
-/******************************************************
- * Allocate a dynamic 2d array implemented as a single array
- * of type data_t.
- */
+/*
+  Allocate a dynamic 2d array implemented as a single array
+  of type data_t.
+*/
 
 data_t * alloc_array_oned (int nx, int ny) {
   data_t *m = (data_t *) malloc(sizeof(data_t) * nx * ny);
@@ -104,9 +103,8 @@ data_t * alloc_array_oned (int nx, int ny) {
 void free_array_oned (data_t *m) {
   free(m);
 }
-/******************************************************/
 
-/* Macros that write the test functions */
+// Macros that write the test functions
 
 #define CLEAR_PTOP(PARAM, EXPR)                      \
   (data_t PARAM, int nx, int ny) {                   \
@@ -116,33 +114,31 @@ void free_array_oned (data_t *m) {
         EXPR = 0;                                    \
   }
 
-
-
-#define SET_ARRAY(PARAM, EXPR)                      \
+#define SET_ARRAY(PARAM, EXPR)                     \
   (data_t PARAM, int nx, int ny) {                 \
     int i,j;                                       \
     for(i=0;i<nx;i++)                              \
       for(j=0;j<ny;j++)   {                        \
         EXPR = (i+1)*(j+1);                        \
-        }   \
+      }                                            \
   }
 
-#define PRINT_ARRAY(PARAM, EXPR)                                         \
-  (data_t PARAM, int nx, int ny) {                                   \
-    int i,j;                                                         \
-    int count = 0;                                                   \
-    for(i=0;i<nx;i++) {                                              \
-      for(j=0;j<ny;j++) {                                             \
-        fprintf(fp,STRINGIFY(MYFORM), EXPR);                          \
-        count += EXPR;                                                \
-      }                                                               \
+#define PRINT_ARRAY(PARAM, EXPR)                                       \
+  (data_t PARAM, int nx, int ny) {                                     \
+    int i,j;                                                           \
+    int count = 0;                                                     \
+    for(i=0;i<nx;i++) {                                                \
+      for(j=0;j<ny;j++) {                                              \
+        fprintf(fp,STRINGIFY(MYFORM), EXPR);                           \
+        count += EXPR;                                                 \
+      }                                                                \
       fprintf(fp,"\n");                                                \
-    }                                                                \
-  if ( count != SUM ) {                                              \
-    fprintf(stderr, "*** Array sum incorrect. Got %d\n",count);      \
-    abort();}                                                        \
-  fprintf(fp,"\n");                                                  \
-}
+    }                                                                  \
+    if ( count != SUM ) {                                              \
+      fprintf(stderr, "*** Array sum incorrect. Got %d\n",count);      \
+      abort();}                                                        \
+    fprintf(fp,"\n");                                                  \
+  }
 
 #define PLAIN_ARRAY                          m[i][j]
 #define DEREF_TWICE                    *(*(m+i) + j)
@@ -152,8 +148,6 @@ void free_array_oned (data_t *m) {
 #define PP_PARAM         **m
 #define ARRAY_PARAM  m[][NY]
 #define ONE_D_PARAM       *m
-
-
 
 void set_ptop_plain_array SET_ARRAY(PP_PARAM, PLAIN_ARRAY);
 void print_ptop_plain_array PRINT_ARRAY(PP_PARAM, PLAIN_ARRAY);
@@ -180,11 +174,13 @@ void print_static_dref_once PRINT_ARRAY(ARRAY_PARAM, DEREF_ONCE);
 void set_array_dynamic_oned SET_ARRAY(ONE_D_PARAM,  DEREF_ONCE);
 void print_array_dynamic_oned PRINT_ARRAY(ONE_D_PARAM, DEREF_ONCE);
 
-// Allocate, set, print, free a dynamic array implemented
-// as a pointer to a pointer and heap storage.
+/*
+  Allocate, set, print, free a dynamic array implemented
+  as a pointer to a pointer and heap storage.
+*/
 
 #define TEST_PTOP(NUM,VAR, SNAME,PNAME)                \
-  fprintf(stderr,"Dynamic test number %d ",NUM);      \
+  fprintf(stderr,"Dynamic test number %d ",NUM);       \
   VAR = alloc_array(nx,ny);                            \
   fprintf(stderr, "Allocated. ");                      \
   SNAME(VAR,nx,ny);                                    \
@@ -203,7 +199,7 @@ void test_dynamic () {
   TEST_PTOP(2,m,set_ptop_deref_twice, print_ptop_deref_twice);
   TEST_PTOP(3,m,set_ptop_deref_twice_alt, print_ptop_deref_twice_alt);
 
-  /* 
+  /*
      Fails when freeing, but otherwise succeeds. This is because we are consistently
      misuing the storage allocated, and we are lucky not to get a segfault till the
      end.
@@ -212,9 +208,8 @@ void test_dynamic () {
   TEST_PTOP(4,m,set_ptop_deref_once, print_ptop_deref_once);
   free_array_flag = 1;
 
-  /* 
-     The following two fail because we are mixing access methods.
-  */
+  // The following two fail because we are mixing access methods.
+
   /*
   fprintf(stderr,"Dynamic test number %d\n",5);
   m = alloc_array(nx,ny);
@@ -230,9 +225,7 @@ void test_dynamic () {
   print_ptop_plain_array(m,nx,ny);
   free_array(m,nx);
   */
-
 }
-
 
 void test_dynamic_oned () {
   int nx = NX;
@@ -266,7 +259,7 @@ void test_dynamic_oned () {
   print_static_dref_once(m,nx,ny);
   free_array_oned(m);
 
-  /* 
+  /*
      In the following two, I mix access routines in setting
      and printing. This works, because static arrays and
      one d implmentation are the same.
@@ -282,26 +275,22 @@ void test_dynamic_oned () {
   set_array_dynamic_oned(m,nx,ny);
   set_static_dref_once(m,nx,ny);
   free_array_oned(m);
-
-
 }
 
-void test_static ()  {
+void test_static () {
   data_t a[NX][NY];
 
   fprintf(stderr,"Static test number %d\n",1);
   set_ptop_deref_once((data_t **)a,NX,NY);
   print_ptop_deref_once((data_t **)a,NX,NY);
+  /*
+    Calling set_array_pointer_to_pointers_x for 1 through 3
+    causes a segmentation fault.
 
-  /* 
-     Calling set_array_pointer_to_pointers_x for 1 through 3
-     causes a segmentation fault.
+    E.g.:
 
-     E.g.:
-
-     set_ptop_deref_twice_alt((data_t **)a,NX,NY);
-     print_ptop_deref_twice_alt((data_t **)a,NX,NY);
-
+    set_ptop_deref_twice_alt((data_t **)a,NX,NY);
+    print_ptop_deref_twice_alt((data_t **)a,NX,NY);
   */
 
   fprintf(stderr,"Static test number %d\n",2);
@@ -315,11 +304,7 @@ void test_static ()  {
   fprintf(stderr, "Static test number %d\n",4);
   set_static_dref_once(a,NX,NY);
   print_static_dref_once(a,NX,NY);
-
 }
-
-
-
 
 void set_SUM () {
   int i,j;
@@ -329,19 +314,14 @@ void set_SUM () {
       SUM += (i+1)*(j+1);
 }
 
-
 int main()
 {
-
   fp = fopen("/dev/null","w");
   //  fp = stdout; // Choose this to see output
-
   set_SUM();
-
   test_dynamic_oned();
   test_static();
   test_dynamic();
-
   fclose(fp);
   return 1;
 }
@@ -360,5 +340,4 @@ void print_2 (data_t **m) {
   }
   printf("\n");
 }
-
 */

@@ -15,9 +15,3 @@ Files will be installed in
  $(INSTALL_PREFIX)/bin
  $(INSTALL_PREFIX)/include
  $(INSTALL_PREFIX)/lib
-
- 
- 
-
-
- 

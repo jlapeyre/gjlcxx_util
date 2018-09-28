@@ -16,7 +16,6 @@
 * or a later version.                                *
 ******************************************************/
 
- 
 /*
   Sun Nov  9 15:57:53 CET 2014
   class gjl::Graph --- Simple graph class to do vertex coloring.
@@ -55,7 +54,7 @@ public:
 
   inline std::vector<edge_list_t>::iterator  vertices_begin() {return adj_.begin();}
   inline std::vector<edge_list_t>::iterator  vertices_end() {return adj_.end();}
-  
+
   inline edge_list_t::iterator edges_begin(vert_t i) {return adj_[i].begin();}
   inline edge_list_t::iterator edges_end(vert_t i) {return adj_[i].end();}
 
@@ -66,7 +65,7 @@ private:
   size_t num_colors_ = 0;
   size_t n_edges_ = 0;
 };  /* End class Graph */
- 
+
 void Graph::add_edge(size_t v, size_t w)
 {
   adj_[v].insert(w);
@@ -74,25 +73,29 @@ void Graph::add_edge(size_t v, size_t w)
   n_edges_++;
 }
 
-// Assigns colors (starting from 0) to all vertices and prints
-// the assignment of colors
+/*
+  Assigns colors (starting from 0) to all vertices and prints
+  the assignment of colors.
+*/
 void Graph::color_vertices()
 {
   const int N = adj_.size();
   int max_color = 0;
   vertex_colors_.resize(N);
   vertex_colors_[0]  = 0;
- 
+
   for (int u = 1; u < N; u++)
     vertex_colors_[u] = -1;  // no color is assigned to u
- 
-    // A temporary array to store the available colors. True
-    // value of available[cr] would mean that the color cr is
-    // assigned to one of its adjacent vertices
+
+  /*
+    A temporary array to store the available colors. True
+    value of available[cr] would mean that the color cr is
+    assigned to one of its adjacent vertices
+  */
   std::vector<bool> available(N); // strict warnings does not like array
   for (int cr = 0; cr < N; cr++)
     available[cr] = false;
- 
+
     // Assign colors to remaining N-1 vertices
     for (int u = 1; u < N; u++)
     {
@@ -108,16 +111,15 @@ void Graph::color_vertices()
         for (cr = 0; cr < N; cr++)
             if (available[cr] == false)
                 break;
- 
+
         vertex_colors_[u] = cr; // Assign the found color
         if (cr > max_color) max_color = cr;
- 
+
         // Reset the values back to false for the next iteration
         for (auto i = edges_begin(u); i != edges_end(u); ++i)
             if (vertex_colors_[*i] != -1)
                 available[vertex_colors_[*i]] = false;
     }
-
     num_colors_ = max_color+1;
 }
 
@@ -128,6 +130,5 @@ void Graph::print_vertex_colors() {
       std::cout << "Vertex " << u << " --->  Color "
                 << vertex_color(u) << std::endl;
 }
-
 
 #endif

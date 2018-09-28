@@ -36,7 +36,7 @@ void test_a_fit ( Datax & x, Datay & y ) {
   const double b_in = 2.1;
   const unsigned int N = x.size();
 
-  fill_data(x.begin(),x.end(),y.begin(), m_in, b_in);  
+  fill_data(x.begin(),x.end(),y.begin(), m_in, b_in);
 
   simple_linear_regression<double> linfit;
 
@@ -74,7 +74,7 @@ void test_a_fit_weighted ( Datax & x, Datay & y, Datay & w ) {
   const double b_in = 2.1;
   const unsigned int N = x.size();
 
-  fill_data(x.begin(),x.end(),y.begin(), m_in, b_in);  
+  fill_data(x.begin(),x.end(),y.begin(), m_in, b_in);
 
   simple_linear_regression<double> linfit;
 

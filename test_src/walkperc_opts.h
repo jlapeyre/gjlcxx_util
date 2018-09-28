@@ -23,7 +23,7 @@ minstd_rand0 -- Discovered in 1969 by Lewis, Goodman and Miller, adopted
 
 minstd_rand -- Newer "Minimum standard", recommended by Park, Miller,
 and Stockmeyer in 1993
-    
+
 mt19937  -- 32-bit Mersenne Twister by Matsumoto and Nishimura, 1998
 
 mt19937_64 -- 64-bit Mersenne Twister by Matsumoto and Nishimura, 2000
@@ -91,7 +91,7 @@ knuth_b -- std::shuffle_order_engine<minstd_rand0, 256>
 #define WALK_2D_GENERATOR knuth_b
 #endif
 
-#define WALKPERC_OPTS_STRINGIFY(a) WALKPERC_OPTS_STRINGIFY_(a) 
+#define WALKPERC_OPTS_STRINGIFY(a) WALKPERC_OPTS_STRINGIFY_(a)
 #define WALKPERC_OPTS_STRINGIFY_(a) #a
 
 #endif

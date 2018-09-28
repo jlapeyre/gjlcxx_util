@@ -18,7 +18,7 @@
  * The image may be set from values in an input array.
  * The array may be interpreted as hues which are encoded with max saturation
  * and value.
- * 
+ *
  * class gjl::FatDataImage -- subclass of gjl::DataImage
  * This represents each site in the input array as a square of pixels.
  * Member functions draw_thin_grey_path() etc. draw a single pixel wide
@@ -28,7 +28,6 @@
  * and drawing sample paths of random walks on the percolation sample.
  *
  */
-
 
 namespace gjl {
   namespace image {
@@ -40,31 +39,32 @@ namespace gjl {
     const int number_of_channels = 4;
     const image_t max_channel_val = 255;
 
-    /* Found on internet. I should try to credit someone. */
-    /* Could move this into compiled library, but maybe some optimization from input
+    // Found on internet. I should try to credit someone.
+    /*
+       Could move this into compiled library, but maybe some optimization from input
        known at compile time ?
     */
-    inline void hsvtorgb(image_t *r, image_t *g, image_t *b, image_t h, 
+    inline void hsvtorgb(image_t *r, image_t *g, image_t *b, image_t h,
                          image_t s, image_t v)
     {
       image_t region, fpart, p, q, t;
-    
+
       if(s == 0) {
         /* color is grayscale */
         *r = *g = *b = v;
         return;
       }
-      
+
       /* make hue 0-5 */
       region = h / 43;
       /* find remainder part, make it from 0-255 */
       fpart = (h - (region * 43)) * 6;
-      
+
       /* calculate temp vars, doing integer multiplication */
       p = (v * (max_channel_val - s)) >> 8;
       q = (v * (max_channel_val - ((s * fpart) >> 8))) >> 8;
       t = (v * (max_channel_val - ((s * (max_channel_val - fpart)) >> 8))) >> 8;
-      
+
       /* assign temp vars based on color cone region */
       switch(region) {
       case 0:
@@ -135,7 +135,7 @@ namespace gjl {
       inline void add_text(const char * k, std::string& v) {
         lodepng_add_text(info_,k,v.c_str());
       }
-      
+
       inline void add_text_to_state(LodePNGInfo& info) {
         info_ = &info;
         if ( author_.length() > 0)
@@ -143,7 +143,7 @@ namespace gjl {
         if ( creator_.length() > 0)
           add_text("Creator", creator_);
       }
-      
+
     private:
       std::string author_ = "John Lapeyre";
       std::string creator_ = "";
@@ -169,7 +169,7 @@ namespace gjl {
       inline virtual dim_t get_width() { return width_;}
       inline virtual dim_t get_height() { return height_;}
 
-      inline void clear() { 
+      inline void clear() {
         image_.clear();
         image_.shrink_to_fit();
         height_ = width_ = 0;
@@ -184,7 +184,7 @@ namespace gjl {
         set_channel(x,y,0,r);
         set_channel(x,y,1,g);
         set_channel(x,y,2,b);
-        set_channel(x,y,3,alpha);        
+        set_channel(x,y,3,alpha);
       }
 
       inline void set_pixel(dim_t x, dim_t y, RGBvalues& rgb) {
@@ -230,14 +230,14 @@ namespace gjl {
         image_text_.add_text_to_state(info);
         return lodepng::encode(png, image_, width_, height_, png_state_);
       }
-      
+
       inline void encode_and_write() {
         std::vector<image_t> png; // Don't make png a member, so that we release storage.
         //        lodepng_error_t error = lodepng::encode(png, image_, width_, height_);
         lodepng_error_t error = encode(png);
         if(!error) lodepng::save_file(png, filename_);
         else {
-          std::cout << "DataImage, lodepng encoder error " << error << 
+          std::cout << "DataImage, lodepng encoder error " << error <<
             ": "<< lodepng_error_text(error) << std::endl;
           abort();
         }
@@ -259,29 +259,29 @@ namespace gjl {
       double max_trans_val_;
       lodepng::State png_state_;
       ImageText image_text_;
-      
+
     }; /* END class DataImage  */
 
-    /*** END class DataImage  *****************************************/
-
-    /*   
-     *   class FatDataImage. Each physical data site is fat_fac x fat_fac pixels in
-     *   the image. We call these 'fatpixels'. We also draw thinner lines on the image.
+    /*
+     * class FatDataImage. Each physical data site is fat_fac x fat_fac pixels in
+     * the image. We call these 'fatpixels'. We also draw thinner lines on the image.
      */
     class FatDataImage : public DataImage {
     public:
 
       inline void set_fat_fac(int fat_fac) { fat_fac_ = fat_fac;}
 
-      /* Set image dimensions and also stash the "physical" dimensions. These
-       will be retrieved when looping over physical sites. */
+      /*
+         Set image dimensions and also stash the "physical" dimensions. These
+         will be retrieved when looping over physical sites.
+      */
       inline void set_dims(dim_t h, dim_t w) override {
         DataImage::set_dims(fat_fac_*h,fat_fac_*w);
         fat_height_ = h;
         fat_width_ = w;
       }
 
-      /* Set each pixel in one fatpixel to the same color */
+      // Set each pixel in one fatpixel to the same color
       inline void set_channel(dim_t x, dim_t y, int ch, image_t val) override {
         dim_t xc = fat_fac_ * x;
         dim_t yc = fat_fac_ * y;
@@ -326,11 +326,11 @@ namespace gjl {
 
       inline dim_t get_fat_width()  { return DataImage::get_width();}
 
-      /* 
+      /*
          Cannot figure out how to call base class methods and
          have them call base class methods, etc. So, we have to do it
          the ugly way. Entirely defeats the purpose of using derived class.
-         "using DataImage::set_channel;" does not work! 
+         "using DataImage::set_channel;" does not work!
       */
 
       inline void set_thin_pixel_rgb(dim_t x, dim_t y, image_t r, image_t g, image_t b,
@@ -338,7 +338,7 @@ namespace gjl {
         set_thin_channel(x,y,0,r);
         set_thin_channel(x,y,1,g);
         set_thin_channel(x,y,2,b);
-        set_thin_channel(x,y,3,alpha);        
+        set_thin_channel(x,y,3,alpha);
       }
 
       inline void set_thin_cont_pixel_rgb(dim_t x, dim_t y, path_direction_t dir, image_t r, image_t g, image_t b,
@@ -379,16 +379,13 @@ namespace gjl {
           set_thin_cont_pixel_grey(x[i+1],y[i+1],dir,grey_value);
         }
       }
-      
+
     private:
       dim_t fat_height_;
       dim_t fat_width_;
       int fat_fac_ = 3;
 
     }; /* END class FatDataImage  */
-    /*** END class FatDataImage  *****************************************/
-
-
   } /* END namespace image */
 } /* END namespace gjl */
 

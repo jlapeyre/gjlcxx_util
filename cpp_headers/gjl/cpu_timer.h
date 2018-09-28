@@ -18,7 +18,6 @@ extern "C" {
 #include "getRSS.h"
 }
 
-
 /*****************************************************
 * Copyright 2014 John Lapeyre                        *
 *                                                    *
@@ -27,7 +26,7 @@ extern "C" {
 * or a later version.                                *
 ******************************************************/
 
-/********************************************************
+/******************************************************************************
  * A class for measuring cpu time and clock time used by process.
  * Also get hostname, and memory use information.
  *
@@ -36,10 +35,7 @@ extern "C" {
  * starting a timer, that is recording the current cpu time consumed, and
  * then recording the elapsed cpu time
  * during part of the code.
- ********************************************************
- */
-
-/********************************************************/
+ ********************************************************/
 
 class CpuTimer {
 public:
@@ -62,7 +58,7 @@ public:
   double to_milliseconds(double s);
   double to_minutes(double s);
   double to_hours(double s);
-  
+
   double milliseconds() {return to_milliseconds(seconds()); }
   double minutes()  {return to_minutes(seconds()); }
   double hours() {return to_hours(seconds()); }
@@ -107,7 +103,7 @@ public:
       label_ = std::string(label); // copy
       time_ = timer->get_split_timeval_();
     }
-    OneSplit(CpuTimer *timer, size_t peakrss, size_t currentrss, 
+    OneSplit(CpuTimer *timer, size_t peakrss, size_t currentrss,
              const std::string& label) {
       label_ = std::string(label); // copy
       time_ = timer->get_split_timeval_();
@@ -140,7 +136,7 @@ public:
   public:
     void save_split(CpuTimer *timer, const std::string& label) {
       if ( timer->is_enabled_save_splits() ) {
-        auto sp = OneSplit(timer,label); 
+        auto sp = OneSplit(timer,label);
         if ( timer->is_enabled_RSS() ) {
           sp.save_peakRSS(getPeakRSS());
           sp.save_currentRSS(getCurrentRSS());
@@ -178,10 +174,10 @@ public:
   void disable_RSS() { enable_RSS_ = false;}
   bool is_enabled_RSS() { return enable_RSS_;}
 
-  /* or ordinary functions in a namespace */
+  // or ordinary functions in a namespace
   static double timeval_to_seconds (const struct timeval &);
   static double rss_to_MB (size_t r) {return ((double)r)/1e6;} // RSS in bytes to megabytes
-  
+
 private:
 
   void   addto_timeval_ (const struct timeval &, struct timeval *  ) const;
@@ -208,8 +204,6 @@ private:
 
 }; /* End class CpuTimer  */
 
-/********************************************************/
-
 class ClockTimer {
 public:
   void start() { wall_clock_start_ = std::time(NULL); }
@@ -222,8 +216,8 @@ public:
   std::string clock_stop_string() const { return ctime(&wall_clock_stop_); }
 
   /*
-  double clock_difference () const {return difftime(wall_clock_stop_, wall_clock_start_);}
-  double clock_record_elapsed_seconds() const {wall_clock_stop_record();
+    double clock_difference () const {return difftime(wall_clock_stop_, wall_clock_start_);}
+    double clock_record_elapsed_seconds() const {wall_clock_stop_record();
     return difftime(wall_clock_stop_, wall_clock_start_);}
   */
 
@@ -234,7 +228,6 @@ public:
   std::string clock_string_hours() {return make_clock_string(hours(), "h");}
   */
 
-
 private:
   std::time_t wall_clock_start_;
   std::time_t wall_clock_stop_;
@@ -242,8 +235,6 @@ private:
   std::string make_clock_string (double clock_time, std::string units);
 
 };  /* End class ClockTimer  */
-
-/********************************************************/
 
 class Timer {
 public:
@@ -272,8 +263,6 @@ private:
   ClockTimer clock_;
   char hostname_char_[1000];
   std::string hostname_string_;
-
 }; /* End class Timer  */
-
 
 #endif

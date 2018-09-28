@@ -136,7 +136,7 @@ template <class Iterx>
 
 template < class OT >
 void simple_linear_regression<OT>::report ( std::ostream & stream ) {
-  stream << "Fit " << n() << " points, Slope m: " 
+  stream << "Fit " << n() << " points, Slope m: "
             << slope() << ",  intercept b: " << intercept() << "\n";
   stream << "Pearson r: " << r() << "\n";
 }

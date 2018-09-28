@@ -20,7 +20,7 @@ ifeq ($(HAVE_GTEST), 1)
 EXECUTABLES_WITH_SINGLE_SOURCE += $(TEST_SRC)/hist_pdf_unittest
 endif
 
-BROKEN_AND_UNUSED1 = 
+BROKEN_AND_UNUSED1 =
 
 # Executables each of which builds from  multiple object files.
 # Specify object files below in Section 2
@@ -93,7 +93,7 @@ $(foreach exe,$(EXECUTABLES_WITH_SINGLE_SOURCE), $(eval $(exe) : $(exe).o))
 # Section 6  Create filenames and groups of filenames.
 ########################################################################################
 # all executables, from single and multiple sources. These are defined in Section 1
-ALL_BINARY_EXECUTABLES = $(EXECUTABLES_WITH_SINGLE_SOURCE) $(EXECUTABLES_WITH_MULT_SOURCE_FILES) 
+ALL_BINARY_EXECUTABLES = $(EXECUTABLES_WITH_SINGLE_SOURCE) $(EXECUTABLES_WITH_MULT_SOURCE_FILES)
 # all object files
 OBJECT_FILES := $(patsubst %,%.o,$(ALL_BINARY_EXECUTABLES)) $(patsubst %,%.o,$(OTHER_SOURCES))
 # Automatic dependency files. These are used in Section 9, but are disabled currently
@@ -203,7 +203,7 @@ simple_linear_regression_test.o : $(CPP_HEADERS_SRC)/simple_linear_regression.h
 # Section 11  Rules to create .c and .h files from gnu gengetopt input files
 ########################################################################################
 
-GENGETOPT = gengetopt --file-name $*  <  $<; ./fix_cmdline_parser.pl $*.c 
+GENGETOPT = gengetopt --file-name $*  <  $<; ./fix_cmdline_parser.pl $*.c
 %.c : %.ggo
 	$(GENGETOPT)
 %.h : %.ggo

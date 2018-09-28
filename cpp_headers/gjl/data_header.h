@@ -6,7 +6,7 @@
 
 /*
   This is not yet working.
- */
+*/
 
 namespace gjl {
   namespace header {
@@ -21,24 +21,22 @@ namespace gjl {
       string_t text_ = "";
     };
 
-
     template <typename object_t>
     class Object {
-      
+
     private: object_t instance_;
-  
+
     };
 
-    
     class Data {
     public:
       template <typename obj_t>
       void add_entry(obj_t x, string_t text) {
-        
+
       }
     private:
       //      std::vector<
-      
+
     };
 
   } /*** END namespace header */

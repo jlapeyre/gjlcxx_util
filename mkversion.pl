@@ -26,8 +26,8 @@ GetOptions ("bump|b!" => \$bump_version_flag,
     )
     or die("Error in command line arguments\n");
 
-sub dosys { 
-    my $c = shift; 
+sub dosys {
+    my $c = shift;
     say STDERR $c;
     system $c unless $dry_run_flag;
 }
@@ -73,7 +73,7 @@ sub bump_git_tag_version {
 #    my $mstring0 = $new_version;
 #    $mstring0 = $mstring if $mstring;
     if ($mstring eq '') {
-        dosys("git tag -a $new_version");        
+        dosys("git tag -a $new_version");
     }
     else {
         dosys("git tag -a $new_version -m \"$mstring\"");

@@ -142,7 +142,7 @@ Print logarithm of all columns except columns 1 and 3, which are printed as read
  log_data_file --linear 1 3 infile1
 
 =head1 DESCRIPTION
-    
+
 For each line for which every field is a number, print a line consisting of
 the log base 10 of each field. Fields are separated by a single space. All
 other lines are copied to the output.

@@ -3,12 +3,12 @@
 #include "gjl/arr_irreg.h"
 #include "walk_2d.h"
 
-/* 
+/*
  * We also have a macro in arr_irreg.h
  * I have to be careful to pass by ref! (don't forget &)
  * Otherwise, even with inline, it is much slower because a copy or something is made.
  */
-/* This has a bug. compare it to the macro, which is corrected 
+/* This has a bug. compare it to the macro, which is corrected
 inline void check_arr_record_time(ArrIrreg<>& total_arr, Walk2D<>& walk) {
   if ( ! total_arr.over_max_ind() ) {
     auto curtime = walk.num_steps_cur();
@@ -47,4 +47,3 @@ int main () {
   }
   return 1;
 }
-

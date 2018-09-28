@@ -52,7 +52,7 @@
 namespace gjl {
 
   namespace hist_pdf {
-    
+
     template <typename bin_t>
     inline bin_t histlog (const bin_t x) { return log10(x); }
 
@@ -76,9 +76,11 @@ public:
   inline void copy_shape(const HistPdf<cnt_t,bin_t>  &other)
   {init(other.n_bins(), other.min(), other.max(), other.using_log());}
 
-  /* But this will not, as is,  copy uselog ! */
-  // inline void copy_shape(const HistPdf<cnt_t,bin_t>  &other)
-  //  {init(other.n_bins(), other.min(), other.max());}
+  // But this will not, as is, copy uselog !
+  /*
+    inline void copy_shape(const HistPdf<cnt_t,bin_t>  &other)
+    {init(other.n_bins(), other.min(), other.max());}
+  */
 
   inline bin_t pdf_integral () const;
   inline bin_t weighted_pdf_integral () const;
@@ -86,14 +88,13 @@ public:
 
   inline bin_t min() const { return maybe_exp(min_); }
   inline bin_t max() const { return maybe_exp(max_); }
-  inline bin_t data_max() const { return maybe_exp(data_max_); } 
-  inline bin_t data_min() const { return maybe_exp(data_min_); } 
+  inline bin_t data_max() const { return maybe_exp(data_max_); }
+  inline bin_t data_min() const { return maybe_exp(data_min_); }
 
   inline bin_t center(ind_t i) const { return maybe_exp(min_ + i * width_ + width_/2);}
 
   inline double logwidth(ind_t i) const {
     return hist_pdf::histexp(min_ + width_ * (i+1))*(1-hist_pdf::histexp(-width_));}
-
   inline bin_t pdf(ind_t i) const {
     if (using_log_) {
       double lw = logwidth(i);
@@ -101,7 +102,6 @@ public:
     }
     return counts_[i] / (n_counts_ * width_);
   }
-
   inline size_t n_counts () const { return n_counts_; }
   inline cnt_t  n_weighted_counts () const { return n_weighted_counts_; }
   inline size_t n_bins () const { return n_bins_; }
@@ -109,20 +109,17 @@ public:
   inline void n_greater_than_max(size_t n) const { n_greater_than_max_ = n; }
   inline size_t n_less_than_min() const { return n_less_than_min_; }
   inline size_t num_merged_hists() const { return num_merged_hists_;}
-
   inline bin_t weighted_pdf (ind_t i) const { return counts_[i] / (n_weighted_counts_ * width_);}
   inline std::vector<cnt_t> * counts () { return & counts_; }  // why cant i use this ?
-
-  // Use & so it can be used as an rvalue. Google code standards doesn't like
-  // this. Use as an lvalue would be clumsy now use add_to_counts
-
+  /*
+    Use & so it can be used as an rvalue. Google code standards doesn't like
+    this. Use as an lvalue would be clumsy now use add_to_counts
+  */
   inline cnt_t count(ind_t i) const { return counts_[i];}
-
   std::ostream& print_pdf_long_header (std::ostream& out) const;
   inline std::ostream& print_pdf_long_line (std::ostream& out, cnt_t count, bin_t cent, bin_t pdf) const;
   std::ostream& print_pdf_long (std::ostream& out) const;
   std::ostream& print_pdf_long () const { return this->print_pdf_long (std::cout);}
-
   void print_pdf_header (std::ostream& out) const;
   inline void print_pdf_line (std::ostream& out, cnt_t count, bin_t cent, bin_t pdf) const;
   void print_pdf (std::ostream& out) const;
@@ -155,12 +152,12 @@ public:
   inline void add_weighted_count(bin_t x, cnt_t weight);
 
   // for merging histograms, add_count is for adding a data point
-  inline void add_to_counts(size_t i, bin_t x) { counts_[i] += x; } 
+  inline void add_to_counts(size_t i, bin_t x) { counts_[i] += x; }
   inline void clear();
 
   inline bool using_log () const { return using_log_ ; }
 
-  inline void use_log(bool uselog) { 
+  inline void use_log(bool uselog) {
     using_log_ = uselog;
     min_ = maybe_log(lin_min_);
     max_ = maybe_log(lin_max_);
@@ -171,7 +168,7 @@ public:
 
   inline void operator+=(const HistPdf<cnt_t,bin_t> & other) {this->merge(other);}
 
-  template<typename Iter>  
+  template<typename Iter>
   inline void merge (Iter start, Iter end) {
     auto start0 = start;
     for(auto it = start+1; it < end; ++it)
@@ -251,15 +248,14 @@ private:
   }
 
   /* We don't exp these even if we have log spacing. */
-  inline bin_t data_max_internal() const { return data_max_; } 
-  inline bin_t data_min_internal() const { return data_min_; }   
-
+  inline bin_t data_max_internal() const { return data_max_; }
+  inline bin_t data_min_internal() const { return data_min_; }
 
 }; /*** END class HistPdf */
 
-/********************************
+/*
   Constructors
-********************************/
+*/
 
 /* g++ did not inline this */
 template <typename cnt_t, typename bin_t>
@@ -395,7 +391,7 @@ bin_t HistPdf<cnt_t,bin_t>::pdf_integral () const {
     for (ind_t i=0; i<n_bins_; ++i)
       sum += logwidth(i) * pdf(i);
   }
-  else 
+  else
     for (ind_t i=0; i<n_bins_; ++i)
       sum += width_ * pdf(i);
   return sum;
@@ -423,7 +419,7 @@ inline std::ostream& HistPdf<cnt_t,bin_t>::print_pdf_long_header (std::ostream& 
 template <typename cnt_t, typename bin_t>
 inline std::ostream& HistPdf<cnt_t,bin_t>::print_pdf_long_line (std::ostream& out, cnt_t count,
                                                          bin_t cent, bin_t pdf) const {
-    if ( count > 0 ) 
+    if ( count > 0 )
       out << log10(cent) << " " << log10(pdf) << " " <<
         cent << " " << pdf << " " << count << std::endl;
     return out;
@@ -436,8 +432,6 @@ std::ostream& HistPdf<cnt_t,bin_t>::print_pdf_long (std::ostream& out) const {
     print_pdf_long_line(out, this->counts_[i], this->center(i), this->pdf(i));
   return out;
 }
-
-/*********************************************************/
 
 template <typename cnt_t, typename bin_t>
 inline void HistPdf<cnt_t,bin_t>::print_pdf_header (std::ostream& out) const {

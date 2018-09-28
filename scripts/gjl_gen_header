@@ -89,7 +89,7 @@ sub make_one_line_writer {
     else {
         $s .= "<< \"\\n\";\n";
     }
-#    return $pad . "$Ostream << comment_str_ << \" \" << $text_var << separator_str_ << $class_getter 
+#    return $pad . "$Ostream << comment_str_ << \" \" << $text_var << separator_str_ << $class_getter
     return $s;
 }
 
@@ -102,7 +102,7 @@ sub make_data_members_string {
     $output_writers .= make_one_line_writer("compile_time_", ensure_string("Compile date"));
     foreach my $h (@Data_members) {
         my ($type,$identifier,$initval,$text,$entry_getter) = (undef,undef,undef,undef,undef);
-        ($type,$identifier,$initval,$text,$entry_getter) 
+        ($type,$identifier,$initval,$text,$entry_getter)
             = ($h->{type}, $h->{identifier}, $h->{initval},$h->{text}, $h->{entry_getter});
         debug_mssg("proccessing: ($type,$identifier,$initval,$text,$entry_getter)");
         $initval = undef if $initval eq $NA_char;
@@ -163,7 +163,7 @@ $data_methods
       private:
 $Cpu_timer{timer_member}
 $Cpu_timer{hostname_member}
-$data_members           
+$data_members
     };
 
     $print_header
@@ -199,7 +199,7 @@ sub strip_double_quotes {
 $Spec_handler{program_name} = sub {
     my (@fields) = @_;
     my $name = ensure_string($fields[0]);
-    add_data_member($String_t, "program_name", 
+    add_data_member($String_t, "program_name",
                     "std::string($name)", ensure_string("program"), $NA_char);
 };
 
@@ -231,7 +231,7 @@ $Spec_handler{version} = sub {
         }
         close($fh);
         error_msg_and_die("Unable to find version number in file '$file'") unless $got_version;
-        add_data_member($String_t, "version", 
+        add_data_member($String_t, "version",
                         "std::string($version)", ensure_string("version"), $NA_char);
     }
 };
@@ -249,7 +249,7 @@ sub read_spec_file {
             my ($entry,@fields) = split(/\s+/,$line);
             if (exists $Spec_handler{$entry}) {
                 &{$Spec_handler{$entry}}(@fields);
-            } 
+            }
             else {
                 croak("Unknown standard entry !$entry");
             }

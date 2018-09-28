@@ -51,7 +51,7 @@ namespace gjl {
     inline data_t val(ind_t i) const {return xa_ * pow(fac_, i - lowest_index_);}
 
     inline data_t operator[] (ind_t i) const {return val(i);}
-  
+
   private:
     data_t xa_ = 0;
     data_t xb_ = 0;

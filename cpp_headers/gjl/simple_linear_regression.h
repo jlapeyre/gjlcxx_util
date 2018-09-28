@@ -31,7 +31,6 @@
 
     // Fit all data in containers x and y
     linfit.fit(x,y);
-
  */
 
 #include <iostream>
@@ -145,7 +144,7 @@ template <class Iterx, class Itery>
 
 template < class output_t >
 void simple_linear_regression<output_t>::report ( std::ostream & stream ) {
-  stream << "Fit " << n() << " points, Slope m: " 
+  stream << "Fit " << n() << " points, Slope m: "
             << slope() << ",  intercept b: " << intercept() << "\n";
   stream << "Pearson r: " << r() << "\n";
 }

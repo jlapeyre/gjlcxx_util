@@ -36,7 +36,7 @@ void A<data_t>::af( void (*g)(data_t, void *p),  void *p) {
 template <typename data_t>
 class B {
 public:
-  void b_callback (data_t i) { 
+  void b_callback (data_t i) {
     std::cout << "B::b_callback got argument " << i << "\n";
     std::cout << "B::b_callback B::bx_ " << bx_ << "\n";
   }
@@ -49,7 +49,7 @@ private:
 template <typename data_t>
 void B<data_t>::b_wrapper_callback(data_t i, void *p) {
   B<data_t> *bp = (B<data_t>*) p;
-  bp->b_callback(i);  
+  bp->b_callback(i);
 }
 
 template <typename data_t>

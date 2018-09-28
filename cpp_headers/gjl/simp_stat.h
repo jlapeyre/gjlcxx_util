@@ -56,7 +56,7 @@ private:
   //  data_t mean_sq_ = 0;
   //  data_t std_dev_ = 0;
   //  data_t error_ = 0;
-  
+
 }; /*** END class SimpStat */
 
 } /*** END namespace gjl */

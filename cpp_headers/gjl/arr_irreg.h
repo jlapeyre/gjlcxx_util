@@ -44,9 +44,9 @@ public:
   ArrIrreg() {}
   ArrIrreg(data_t xa, data_t xb, size_t n) { set_xa_xb_n(xa,xb,n); }
   inline void set_xa_xb_n(data_t xa, data_t xb, size_t n) { time_.set_xa_xb_n(xa,xb,n); init_arr();}
-  inline void init_arr() { 
-    arr_.clear(); counts_.clear(); 
-    arr_.resize(number_of_elements()); 
+  inline void init_arr() {
+    arr_.clear(); counts_.clear();
+    arr_.resize(number_of_elements());
     counts_.resize(number_of_elements());
     index_ = 0;
     highest_index_with_full_count_ = -1;
@@ -67,7 +67,7 @@ public:
   inline size_t& counts(int i) { return counts_[ind(i)];}
 
   inline data_t get_next_time() const {return time_[index_];}
-  
+
   inline void record_arr(data_t val) {
     ++counts_[index_];
     arr_sum_add_to(index_++, val);
@@ -96,7 +96,7 @@ public:
     for(int i=0; i < (int) arr_.size(); ++i) {
       auto t = time_[i];
       auto m = get_arr(i);
-      if (t>0 && m>0) 
+      if (t>0 && m>0)
         out << log10(t) << " " << log10(m) << "\n";
     }
   }
@@ -111,7 +111,7 @@ public:
       auto t = time_[i];
       auto m = get_arr(i);
       auto c = counts(i);
-      if (t>0 && m>0 && c > 0) 
+      if (t>0 && m>0 && c > 0)
         out << log10(t) << " " << log10(m) << " " << log10(c) << "\n";
     }
   }
@@ -147,6 +147,5 @@ private:
   int index_ = 0;
   int highest_index_with_full_count_ = -1;
 };  /*** END class ArrIrreg  */
-
 
 #endif

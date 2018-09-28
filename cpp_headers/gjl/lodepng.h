@@ -26,8 +26,6 @@ freely, subject to the following restrictions:
     distribution.
 */
 
-
-
 #include <string.h> /*for size_t*/
 
 #ifdef __cplusplus

@@ -93,7 +93,7 @@ void CpuTimer::total_and_split_seconds (double *total , double *split) {
   struct timeval return_time;
   record();
   timeval_subtract_(total_cpu_time_,
-                    last_cpu_time_, &return_time); 
+                    last_cpu_time_, &return_time);
   *split = timeval_to_seconds(return_time);
   timeval_subtract_(total_cpu_time_,
                     start_cpu_time_, &return_time);
@@ -126,10 +126,10 @@ void CpuTimer::addto_timeval_ (const struct timeval &t, struct timeval *result) 
   result->tv_usec = usum;
 }
 
-/* grabbed this off net 
+/* grabbed this off net
  compute x - y --> result
 */
-int CpuTimer::timeval_subtract_ (const struct timeval &x, 
+int CpuTimer::timeval_subtract_ (const struct timeval &x,
                                  const struct timeval &y, struct timeval *result) const
 {
   auto yusec = y.tv_usec;
