@@ -1,6 +1,7 @@
 ## Utility routines and classes for C/C++
 
-These tools are for things I use repeatedly, mostly for Monte Carlo simulations.
+These tools are [were] for things I use repeatedly, mostly for Monte Carlo simulations. My need
+for this code has been (so fare) obsoleted by Julia.
 
 See the comments in template headers [cpp_headers/](c_cpp_problems/) for descriptions
 and usage.

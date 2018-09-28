@@ -1,6 +1,5 @@
 *~
 *.o
-
 a.out
 libgjlutils.a
 simple_linear_regression_test
@@ -9,4 +8,3 @@ hist_pdf_unittest
 test_hist_pdf
 vec2d
 test_arr_irreg
-
